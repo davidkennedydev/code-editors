@@ -20,6 +20,12 @@ RUN cd ~/.vim/bundle; \
       git clone --depth=1 --branch=master https://github.com/rhysd/vim-clang-format.git
 RUN dnf install -y clang
 
+# File Fuzzy Finder
+RUN cd ~/.vim/bundle; \
+      git clone --depth=1 --branch=master https://github.com/junegunn/fzf.vim.git;
+RUN dnf install -y fzf ripgrep
+RUN echo "export FZF_DEFAULT_COMMAND='rg --files --follow'" >> /etc/bashrc
+
 ADD vimrc /root/.vimrc
 
 # Run as a common user

@@ -11,3 +11,9 @@ augroup filetypedetect
   au BufRead,BufNewFile *.java map = :ClangFormat<ENTER>
 augroup end
 
+" Fuzzy finder
+nmap <c-p> :Files<cr>
+" <c-t> open file in new tab
+" <c-v> open file in vertical split
+" <c-x> open file in horizontal split
+
