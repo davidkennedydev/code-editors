@@ -1,0 +1,13 @@
+execute pathogen#infect()
+syntax on
+filetype plugin indent on
+set encoding=utf-8
+set shiftwidth=2 tabstop=2
+
+" Clang format plugin
+let g:clang_format#auto_format=0
+augroup filetypedetect
+  au BufRead,BufNewFile *.c,*.h,*.cpp,*.hpp,*.cc map = :ClangFormat<ENTER>
+  au BufRead,BufNewFile *.java map = :ClangFormat<ENTER>
+augroup end
+
