@@ -3,6 +3,7 @@ syntax on
 filetype plugin indent on
 set encoding=utf-8
 set shiftwidth=2 tabstop=2
+colorscheme default
 
 " Clang format plugin
 let g:clang_format#auto_format=0
@@ -16,4 +17,14 @@ nmap <c-p> :Files<cr>
 " <c-t> open file in new tab
 " <c-v> open file in vertical split
 " <c-x> open file in horizontal split
+
+" Snippets
+let g:ycm_use_ultisnips_completer = 1
+let g:ycm_key_list_stop_completion = ['<c-j>', '<c-k>']
+" Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
+let g:UltiSnipsExpandTrigger="<c-h>"
+let g:UltiSnipsJumpForwardTrigger="<c-j>"
+let g:UltiSnipsJumpBackwardTrigger="<c-k>"
+let g:UltiSnipsEditSplit="vertical"
+let g:UltiSnipsDisablePreview=1
 

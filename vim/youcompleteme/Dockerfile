@@ -26,6 +26,11 @@ RUN cd ~/.vim/bundle; \
 RUN dnf install -y fzf ripgrep
 RUN echo "export FZF_DEFAULT_COMMAND='rg --files --follow'" >> /etc/bashrc
 
+# Snippets
+RUN cd ~/.vim/bundle; \
+      git clone --depth=1 --branch=master https://github.com/SirVer/ultisnips.git; \
+      git clone --depth=1 --branch=master https://github.com/honza/vim-snippets.git;
+
 ADD vimrc /root/.vimrc
 
 # Run as a common user
