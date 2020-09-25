@@ -16,6 +16,8 @@ RUN export uid=1000 gid=1000 && \
     chmod 0440 /etc/sudoers.d/$USER && \
     chown ${uid}:${gid} -R /home/$USER
 
+RUN dnf install -y libdrm mesa-libgbm
+
 USER $USER
 ENV HOME /home/$USER
-CMD code --wait
+CMD code --verbose 
