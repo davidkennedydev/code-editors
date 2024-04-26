@@ -1,44 +1,51 @@
-FROM fedora:latest
+FROM fedora:latest as system_package_dependencies
 
-RUN dnf install -y vim
+RUN dnf install -y   \
+      clang          \
+      cmake          \
+      curl           \
+      fzf            \
+      gcc-c++        \
+      git            \
+      make           \
+      python3-devel  \
+      ripgrep        \
+      vim            \
+    ;echo "System dependencies installed"
 
-#Pathogen
-RUN dnf install -y curl
-RUN mkdir -p ~/.vim/autoload ~/.vim/bundle; \
-    curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim;
+FROM system_package_dependencies as vim_plugins_init
 
-# YouCompleteMe
-RUN dnf install -y git
-RUN cd ~/.vim/bundle; \
-    git clone --recursive --depth=1 --branch=master https://github.com/ycm-core/YouCompleteMe.git;
-RUN sudo dnf install -y cmake gcc-c++ make python3-devel
-RUN cd ~/.vim/bundle/YouCompleteMe; \
+RUN groupadd --system userland \
+      && useradd -m --system --group userland nonroot
+
+USER nonroot
+ENV HOME /home/nonroot
+WORKDIR /home/nonroot
+
+ENV VIM_PLUGINS_AUTOSTARTED_PATH $HOME/.vim/pack/plugins/start
+
+RUN mkdir -p $VIM_PLUGINS_AUTOSTARTED_PATH && cd $VIM_PLUGINS_AUTOSTARTED_PATH; \
+      git clone --depth=1 --branch=master https://github.com/SirVer/ultisnips.git; \
+      git clone --depth=1 --branch=master https://github.com/honza/vim-snippets.git; \
+      git clone --recursive --depth=1 --branch=master https://github.com/ycm-core/YouCompleteMe.git; \
+      git clone --depth=1 --branch=master https://github.com/rhysd/vim-clang-format.git; \
+      git clone --depth=1 --branch=master https://github.com/junegunn/fzf.git; \
+      git clone --depth=1 --branch=master https://github.com/junegunn/fzf.vim.git; \
+    echo "Plugins cloned on the proper vim path"
+
+FROM vim_plugins_init as vim_plugins
+
+# Configure YouCompleteMe
+RUN cd $VIM_PLUGINS_AUTOSTARTED_PATH/YouCompleteMe; \
     python3 install.py --clangd-completer
 
-# Clang Format
-RUN cd ~/.vim/bundle; \
-      git clone --depth=1 --branch=master https://github.com/rhysd/vim-clang-format.git
-RUN dnf install -y clang
+USER root
 
-# File Fuzzy Finder
-RUN cd ~/.vim/bundle; \
-      git clone --depth=1 --branch=master https://github.com/junegunn/fzf.vim.git;
-RUN dnf install -y fzf ripgrep
+# Configure File Fuzzy Finder
 RUN echo "export FZF_DEFAULT_COMMAND='rg --files --follow'" >> /etc/bashrc
 
-# Snippets
-RUN cd ~/.vim/bundle; \
-      git clone --depth=1 --branch=master https://github.com/SirVer/ultisnips.git; \
-      git clone --depth=1 --branch=master https://github.com/honza/vim-snippets.git;
+USER nonroot
 
-ADD vimrc /root/.vimrc
-
-# Run as a common user
-ARG USER
-RUN adduser $USER; usermod -a -G root $USER
-WORKDIR /home/$USER
-RUN ln -s /root/.vim
-RUN ln -s /root/.vimrc
-USER $USER
+ADD vimrc $HOME/.vimrc
 
 CMD vim
